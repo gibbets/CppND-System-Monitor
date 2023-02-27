@@ -266,5 +266,21 @@ string LinuxParser::User(int pid) {
 }
 
 long LinuxParser::UpTime(int pid) {
-  return ActiveJiffies(pid) / sysconf(_SC_CLK_TCK);
+  string starttime;
+  string dummy;
+  string line;
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    for(int i = 0; i < 21; i++) {
+      //skip the first 21 entries.
+      linestream >> dummy;
+    }
+
+    linestream >> starttime;
+
+  }
+
+  return UpTime() - std::stol(starttime)/sysconf(_SC_CLK_TCK);
 }
